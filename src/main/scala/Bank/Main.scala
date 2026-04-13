@@ -1,23 +1,53 @@
 package Bank
 
-import akka.actor.ActorSystem
-import akka.actor.Props
-import Bank.actors._
-import Bank.models._
+import akka.actor.typed.{ActorSystem, SupervisorStrategy}
+import akka.actor.typed.scaladsl.Behaviors
+import scala.concurrent.duration.*
+import Bank.actors.*
+import Bank.models.*
+import Bank.petri.*
 
 object Main extends App {
-  val system = ActorSystem("BankSystem")
 
-  val account = system.actorOf(Props[Account], "account")
-  val ledger = system.actorOf(Props[Ledger], "ledger")
-  val fraud = system.actorOf(Props[Fraud], "fraud")
+  val root = Behaviors.setup[Nothing] { context =>
 
-  val transactionManager =
-    system.actorOf(Props(new TransactionManager(account, fraud, ledger)), "txManager")
+    val ledger = context.spawn(Ledger(), "Ledger")
 
-  // Tests
-  transactionManager ! Deposit("user1", 500)
-  transactionManager ! Withdraw("user1", 200)
-  transactionManager ! Deposit("user2", 1500)
-  transactionManager ! Withdraw("user1", 400)
+    // ── Supervision : restart automatique en cas d'exception ─────────────────
+    val supervisedAccount = (id: String, balance: Double) =>
+      Behaviors
+        .supervise(BankAccount(id, balance, ledger))
+        .onFailure[Exception](SupervisorStrategy.restart)
+
+    val alice   = context.spawn(supervisedAccount("Alice",   800.0), "Alice")
+    val bob     = context.spawn(supervisedAccount("Bob",     500.0), "Bob")
+    val charlie = context.spawn(supervisedAccount("Charlie", 300.0), "Charlie")
+
+    ledger ! RegisterAccount("Alice",   alice)
+    ledger ! RegisterAccount("Bob",     bob)
+    ledger ! RegisterAccount("Charlie", charlie)
+
+    // ── Supervision du TransferManager : resume en cas d'erreur non critique ──
+    val supervisedTransfer =
+      Behaviors
+        .supervise(TransferManager(ledger))
+        .onFailure[Exception](SupervisorStrategy.resume)
+
+    val transfer = context.spawn(supervisedTransfer, "TransferManager")
+
+    transfer ! TransferRequest(alice,   bob,     200.0)
+    transfer ! TransferRequest(bob,     charlie, 150.0)
+    transfer ! TransferRequest(charlie, alice,   500.0)
+    transfer ! TransferRequest(alice,   bob,    1500.0)
+
+    context.scheduleOnce(2.seconds, ledger, PrintHistory)
+    context.scheduleOnce(3.seconds, ledger, PrintBalances)
+
+    Behaviors.empty
+  }
+
+  PetriNetAnalyzer.analyze(BankPetriNet.net)
+  val system = ActorSystem[Nothing](root, "BankSystem")
+  Thread.sleep(4000)
+  system.terminate()
 }
