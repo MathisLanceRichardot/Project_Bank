@@ -1,25 +1,26 @@
+import com.typesafe.sbt.packager.Keys.*
+
 ThisBuild / version      := "0.1.0-SNAPSHOT"
 ThisBuild / scalaVersion := "3.3.7"
 
-lazy val akkaVersion   = "2.8.8"
-lazy val scalaFxVersion = "26.0.0-R38"
-
-lazy val root = (project in file("."))
+lazy val root = project.in(file("."))
+  .enablePlugins(JavaAppPackaging)
   .settings(
     name := "Project_Bank",
-
     libraryDependencies ++= Seq(
-      "com.typesafe.akka" %% "akka-actor-typed"         % akkaVersion,
-      "com.typesafe.akka" %% "akka-slf4j"               % akkaVersion,
-      "com.typesafe.akka" %% "akka-actor-testkit-typed" % akkaVersion % Test,
-      "org.scalatest"     %% "scalatest"                % "3.2.20"    % Test,
-      "ch.qos.logback"     % "logback-classic"          % "1.5.32",
-      "org.scalafx"       %% "scalafx"                  % scalaFxVersion
+      "com.typesafe.akka" %% "akka-actor-typed" % "2.8.8",
+      "org.scalafx"       %% "scalafx"          % "23.0.1-R34",
+      "ch.qos.logback"     % "logback-classic"  % "1.5.32"
     ),
 
-    // Nécessaire pour JavaFX sur Java 11+
-    javaOptions ++= Seq(
-      "--add-modules", "javafx.controls,javafx.fxml"
+    Compile / mainClass := Some("Bank.ui.BankUI"),
+
+    Universal / javaOptions ++= Seq(
+      "-Dfile.encoding=UTF-8",
+      "--add-modules", "javafx.controls,javafx.fxml",
+      "--add-exports", "javafx.graphics/com.sun.javafx.application=ALL-UNNAMED",
+      "--enable-native-access=ALL-UNNAMED"
     ),
+
     fork := true
   )

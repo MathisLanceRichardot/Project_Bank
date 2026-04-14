@@ -40,12 +40,10 @@ object Main extends App {
     transfer ! TransferRequest(charlie, alice,   500.0)
     transfer ! TransferRequest(alice,   bob,    1500.0)
 
-    context.scheduleOnce(2.seconds, ledger, PrintHistory)
-    context.scheduleOnce(3.seconds, ledger, PrintBalances)
 
     Behaviors.empty
   }
-  
+
   val system = ActorSystem[Nothing](root, "BankSystem")
   Thread.sleep(4000)
   system.terminate()
