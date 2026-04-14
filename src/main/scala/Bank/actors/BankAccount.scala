@@ -35,7 +35,6 @@ object BankAccount {
         active(id, balance + amount, ledger)
 
       case GetBalance(replyTo) =>
-        ledger ! LogEvent(s"BALANCE | $id | solde=$balance")
         replyTo ! BalanceResult(id, balance)
         Behaviors.same
     }

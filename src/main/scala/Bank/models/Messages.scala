@@ -25,6 +25,8 @@ case class LogDebit(account: String, amount: Double, newBalance: Double)  extend
 case class LogCredit(account: String, amount: Double, newBalance: Double) extends LedgerMessage
 case object PrintHistory extends LedgerMessage
 case object PrintBalances extends LedgerMessage
+case class QueryBalance(accountId: String)                                        extends LedgerMessage
+case class PrintBalancesOrdered(order: Vector[String])                            extends LedgerMessage
 case class RegisterAccount(id: String, ref: ActorRef[BankMessage]) extends LedgerMessage
 
 sealed trait TransferStatus
@@ -39,3 +41,4 @@ case object CreditSuccess extends TransferResponse
 
 sealed trait BalanceResponse
 case class BalanceResult(id: String, balance: Double) extends BalanceResponse
+case object BalanceTimeout extends BalanceResponse

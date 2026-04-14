@@ -5,7 +5,7 @@ import akka.actor.typed.scaladsl.Behaviors
 import scala.concurrent.duration.*
 import Bank.actors.*
 import Bank.models.*
-import Bank.petri.*
+
 
 object Main extends App {
 
@@ -45,8 +45,7 @@ object Main extends App {
 
     Behaviors.empty
   }
-
-  PetriNetAnalyzer.analyze(BankPetriNet.net)
+  
   val system = ActorSystem[Nothing](root, "BankSystem")
   Thread.sleep(4000)
   system.terminate()
