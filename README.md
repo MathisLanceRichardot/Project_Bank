@@ -92,6 +92,7 @@ export JAVA_HOME=/usr/lib/jvm/java-21-openjdk-amd64
 
 # Windows
 $env:JAVA_HOME = "C:\Program Files\Java\jdk-21"
+
 ```## 📂 Structure du Projet
 
 L'organisation des fichiers suit les conventions standard de **sbt** avec une séparation claire entre la logique métier (Acteurs), les modèles formels (Pétri) et l'interface utilisateur.
