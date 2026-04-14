@@ -13,7 +13,7 @@ lazy val root = project.in(file("."))
       "ch.qos.logback"     % "logback-classic"  % "1.5.32"
     ),
 
-    Compile / mainClass := Some("Bank.ui.BankUI"),
+    Compile / mainClass := Some("Bank.ui."),
 
     Universal / javaOptions ++= Seq(
       "-Dfile.encoding=UTF-8",
