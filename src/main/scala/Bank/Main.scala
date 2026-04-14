@@ -20,12 +20,12 @@ object Main extends App {
         .onFailure[Exception](SupervisorStrategy.restart)
 
     val alice   = context.spawn(supervisedAccount("Alice",   800.0), "Alice")
-    val bob     = context.spawn(supervisedAccount("Bob",     500.0), "Bob")
-    val charlie = context.spawn(supervisedAccount("Charlie", 300.0), "Charlie")
+    val clement    = context.spawn(supervisedAccount("Clement",     500.0), "Clement")
+    val vincent = context.spawn(supervisedAccount("Vincent", 300.0), "Vincent")
 
     ledger ! RegisterAccount("Alice",   alice)
-    ledger ! RegisterAccount("Bob",     bob)
-    ledger ! RegisterAccount("Charlie", charlie)
+    ledger ! RegisterAccount("Clement",     clement)
+    ledger ! RegisterAccount("Vincent", vincent)
 
     // ── Supervision du TransferManager : resume en cas d'erreur non critique ──
     val supervisedTransfer =
@@ -35,10 +35,10 @@ object Main extends App {
 
     val transfer = context.spawn(supervisedTransfer, "TransferManager")
 
-    transfer ! TransferRequest(alice,   bob,     200.0)
-    transfer ! TransferRequest(bob,     charlie, 150.0)
-    transfer ! TransferRequest(charlie, alice,   500.0)
-    transfer ! TransferRequest(alice,   bob,    1500.0)
+    transfer ! TransferRequest(alice,   clement,     200.0)
+    transfer ! TransferRequest(clement,     vincent, 150.0)
+    transfer ! TransferRequest(vincent, alice,   500.0)
+    transfer ! TransferRequest(alice,   clement,    1500.0)
 
 
     Behaviors.empty

@@ -1,10 +1,9 @@
-import com.typesafe.sbt.packager.Keys.*
+import sbtassembly.AssemblyPlugin.autoImport._
 
 ThisBuild / version      := "0.1.0-SNAPSHOT"
 ThisBuild / scalaVersion := "3.3.7"
 
 lazy val root = project.in(file("."))
-  .enablePlugins(JavaAppPackaging)
   .settings(
     name := "Project_Bank",
     libraryDependencies ++= Seq(
@@ -13,13 +12,19 @@ lazy val root = project.in(file("."))
       "ch.qos.logback"     % "logback-classic"  % "1.5.32"
     ),
 
-    Compile / mainClass := Some("Bank.ui."),
+    // Configuration pour le JAR unique (Assembly)
+    assembly / mainClass := Some("Bank.ui.BankUI"),
 
-    Universal / javaOptions ++= Seq(
+    assembly / assemblyMergeStrategy := {
+      case PathList("reference.conf") => MergeStrategy.concat
+      case PathList("META-INF", xs @ _*) => MergeStrategy.discard
+      case x => MergeStrategy.first
+    },
+
+    // Options pour JavaFX et Akka
+    run / javaOptions ++= Seq(
       "-Dfile.encoding=UTF-8",
-      "--add-modules", "javafx.controls,javafx.fxml",
-      "--add-exports", "javafx.graphics/com.sun.javafx.application=ALL-UNNAMED",
-      "--enable-native-access=ALL-UNNAMED"
+      "--add-modules", "javafx.controls,javafx.fxml"
     ),
 
     fork := true
