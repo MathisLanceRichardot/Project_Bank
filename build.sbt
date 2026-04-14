@@ -15,7 +15,6 @@ lazy val root = project.in(file("."))
       "org.scalatest"     %% "scalatest"                % "3.2.18" % Test
     ),
 
-    Compile / mainClass := Some("Bank.ui.BankUI"),
 
     Universal / javaOptions ++= Seq(
       "-Dfile.encoding=UTF-8",
