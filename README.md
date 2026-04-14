@@ -56,9 +56,12 @@ sudo apt-get update && sudo apt-get install sbt
 ```bash
 sbt stage
 cd target/universal/stage/bin/
-./project_bank        # Linux
-project_bank.bat      # Windows
+./bank-ui       # Linux
+./main          # Linux
+bank-ui.bat     # Windows
+main.bat        # Windows
 ```
+ou simplement pour les fichiers bat sur windows cliqué sur les fichiers .bat et sur linux les autres avec **Clique droit** > Run as Programm
 
 ---
 
